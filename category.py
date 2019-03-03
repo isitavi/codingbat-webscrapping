@@ -35,9 +35,17 @@ for innerlink in allResource:
     targetDivs = innerSoup.find("div", {"class": "tabin"})
     questionURL = [baseURL+td.a['href']
                    for td in targetDivs.table.find_all('td')]
-    for url in questionURL:
-        print(url)
-    break
 
-    # allCategory = [allCat.table.tr.td.a['href'] for allCat in targetDivs]
-    # print(allCategory)
+    # Grab all contents from question links
+    for contents in questionURL:
+        contentResponse = requests.get(contents, headers=headers)
+        contentSoup = BeautifulSoup(contentResponse.content, 'lxml')
+        contentDiv = contentSoup.find("div", {"class": "indent"})
+        problemStatement = contentDiv.table.div.text
+        nextSiblings = contentDiv.table.div.next_siblings
+
+        getExample = [
+            sibling for sibling in nextSiblings if sibling.string is not None]
+        print(problemStatement)
+        for example in getExample:
+            print(example)
